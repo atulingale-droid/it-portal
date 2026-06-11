@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IT Software Download Center</title>
+
+<style>
+    /* Global Styles */
+    * {
+        box-sizing: border-box;
+    }
+    
+    body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        background-color: #f8fafc;
+        background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
+        background-size: 24px 24px;
+        display: flex;
+        color: #334155;
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+
+    /* Login Screen Styles */
+    .login-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #1e1b4b 100%);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+    }
+
+    .login-box {
+        background: rgba(255, 255, 255, 0.98);
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.3);
+        width: 100%;
+        max-width: 380px;
+        text-align: center;
+    }
+
+    .login-brand-header {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: #1e3a8a;
+        letter-spacing: -0.5px;
+        margin-bottom: 4px;
+    }
+    
+    .login-brand-header span {
+        color: #f97316;
+    }
+
+    .login-box h2 {
+        margin: 10px 0 4px 0;
+        color: #0f172a;
+        font-size: 1.15rem;
+        font-weight: 700;
+    }
+
+    .login-box p {
+        color: #64748b;
+        font-size: 0.85rem;
+        margin-bottom: 20px;
+        margin-top: 0;
+    }
+
+    .login-box .credits {
+        font-size: 0.7rem;
+        color: #2563eb;
+        margin-bottom: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .login-input {
+        width: 100%;
+        padding: 10px 14px;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        margin-bottom: 12px;
+        outline: none;
+        text-align: center;
+        transition: all 0.2s ease;
+        background-color: #f8fafc;
+    }
+
+    .login-input:focus {
+        border-color: #2563eb;
+        background-color: #fff;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    .error-msg {
+        color: #dc2626;
+        font-size: 0.8rem;
+        margin-bottom: 12px;
+        display: none;
+        font-weight: 600;
+        background-color: #fee2e2;
+        padding: 8px;
+        border-radius: 6px;
+    }
+
+    /* Sidebar Navigation */
+    .sidebar {
+        width: 260px;
+        height: 100vh;
+        background: #0f172a;
+        position: fixed;
+        color: white;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        z-index: 10;
+        box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+    }
+
+    .sidebar-header {
+        padding: 20px 16px;
+        border-bottom: 1px solid #334155;
+        text-align: center;
+    }
+
+    .sidebar-brand {
+        font-size: 1.15rem;
+        font-weight: 800;
+        letter-spacing: 1px;
+        color: #ffffff;
+        margin-bottom: 4px;
+    }
+    
+    .sidebar-brand span {
+        color: #f97316;
+    }
+
+    .sidebar p {
+        margin: 0;
+        font-size: 0.75rem;
+        color: #94a3b8;
+        font-weight: 500;
+    }
+
+    .sidebar .nav-links {
+        margin-top: 10px;
+    }
+
+    .sidebar a {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #cbd5e1;
+        padding: 10px 20px;
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.85rem;
+        transition: all 0.2s ease;
+        border-left: 4px solid transparent;
+        cursor: pointer;
+    }
+
+    .sidebar a:hover {
+        background: #1e293b;
+        color: white;
+        border-left-color: #2563eb;
+    }
+    
+    .sidebar a.active {
+        background: #1e293b;
+        color: white;
+        border-left-color: #2563eb;
+        font-weight: 600;
+    }
+
+    .sidebar-quote {
+        display: block;
+        padding: 10px 14px;
+        margin: 12px 16px;
+        font-size: 0.75rem;
+        line-height: 1.4;
+        color: #94a3b8;
+        background: #1e293b;
+        border-radius: 6px;
+        border-left: 3px solid #f97316;
+        font-style: italic;
+    }
+
+    /* Top Right Controls */
+    .top-controls {
+        position: absolute;
+        top: 20px;
+        right: 40px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        z-index: 100;
+    }
+
+    .btn-logout {
+        background: #ef4444;
+        color: white;
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 0.8rem;
+        padding: 8px 14px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.2s ease, transform 0.1s ease;
+        border: none;
+        box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .btn-logout:hover {
+        background: #b91c1c;
+        transform: translateY(-1px);
+    }
+
+    /* Main Content Area */
+    .content {
+        margin-left: 260px;
+        padding: 30px 40px;
+        width: calc(100% - 260px);
+        position: relative;
+    }
+
+    .header {
+        background: white;
+        padding: 20px 24px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05), 0 1px 2px rgba(0,0,0,0.1);
+    }
+
+    /* Ticker Panel Layout */
+    .ticker-panel {
+        background: #fffbeb;
+        border-left: 4px solid #d97706;
+        border-radius: 4px;
+        margin-bottom: 20px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        padding: 8px 0;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        width: calc(100% - 130px);
+    }
+
+    .ticker-label {
+        background: #d97706;
+        color: #ffffff;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        padding: 4px 10px;
+        margin-left: 8px;
+        border-radius: 3px;
+        white-space: nowrap;
+        z-index: 2;
+    }
+
+    .ticker-wrap {
+        width: 100%;
+        overflow: hidden;
+    }
+
+    .ticker-content {
+        display: inline-block;
+        white-space: nowrap;
+        padding-left: 100%;
+        animation: marquee 30s linear infinite;
+    }
+
+    .ticker-content:hover {
+        animation-play-state: paused;
+    }
+
+    .ticker-string {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #78350f;
+        display: inline-block;
+    }
+
+    @keyframes marquee {
+        0% { transform: translate3d(0, 0, 0); }
+        100% { transform: translate3d(-100%, 0, 0); }
+    }
+
+    .header h1 {
+        margin-top: 0;
+        margin-bottom: 4px;
+        font-size: 1.5rem;
+        color: #0f172a;
+        font-weight: 700;
+        letter-spacing: -0.5px;
+    }
+
+    .header p {
+        margin-top: 0;
+        margin-bottom: 14px;
+        color: #64748b;
+        font-size: 0.85rem;
+    }
+
+    .header .creator-tag {
+        font-size: 0.8rem;
+        color: #2563eb;
+        font-weight: 600;
+        margin-top: -10px;
+        margin-bottom: 14px;
+    }
+
+    .search {
+        width: 100%;
+        padding: 10px 16px;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        font-size: 0.9rem;
+        outline: none;
+        transition: all 0.2s;
+        background-color: #f8fafc;
+    }
+
+    .search:focus {
+        border-color: #2563eb;
+        background-color: #fff;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1)
+    }
+
+    /* Resource Cards & Files Layout */
+    .card-container, .file-container {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .card, .file-row {
+        background: white;
+        padding: 14px 20px;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        border: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: all 0.2s ease;
+    }
+
+    .card:hover, .file-row:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        border-color: #cbd5e1;
+    }
+
+    .card-details h3, .file-info h3 {
+        margin: 0 0 4px 0;
+        color: #1e293b;
+        font-size: 1rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .card-details p, .file-info p {
+        margin: 0;
+        color: #64748b;
+        font-size: 0.8rem;
+    }
+
+    /* Buttons & Badges */
+    .btn {
+        background: #2563eb;
+        color: white;
+        padding: 8px 16px;
+        text-decoration: none;
+        border-radius: 6px;
+        font-weight: 600;
+        font-size: 0.85rem;
+        transition: background 0.2s ease;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+        cursor: pointer;
+        border: none;
+    }
+
+    .btn:hover {
+        background: #1d4ed8;
+    }
+
+    .btn-folder {
+        background: #64748b;
+    }
+
+    .btn-folder:hover {
+        background: #475569;
+    }
+
+    .btn-back {
+        background: #0f172a;
+        margin-bottom: 16px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .btn-back:hover {
+        background: #1e293b;
+    }
+
+    /* Sub-folder Panel Custom Design */
+    #folderPanel {
+        display: none;
+    }
+
+    .folder-path-header {
+        font-weight: 700;
+        color: #0f172a;
+        font-size: 1.1rem;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        border-bottom: 2px solid #e2e8f0;
+        padding-bottom: 8px;
+    }
+
+    /* Graphical Icon Color Accents */
+    .icon-sh { color: #10b981; }
+    .icon-pdf { color: #ef4444; }
+    .icon-pptx { color: #f97316; }
+    .icon-xlsx { color: #22c55e; }
+    .icon-zip { color: #a855f7; }
+    .icon-exe { color: #2563eb; }
+    .icon-iso { color: #0284c7; }
+    .icon-dir { color: #eab308; }
+</style>
+
+<script>
+// USER DATABASE
+const allowedUsers = {
+    "atul": { password: "9511", displayName: "Atul Ingale" },
+    "suraj": { password: "1847", displayName: "Suraj Langar" },
+    "sandesh": { password: "2026", displayName: "Sandesh Kharat" }
+};
+
+// 100% PERFECTLY ACCURATE MAPPED REAL DIRECTORY DATABASE FROM IMAGES
+const folderDatabase = {
+    "Domain Join & CCTV Scripts": [
+        { name: "cctv.sh", type: "sh", desc: "Bash script executable configuration file" },
+        { name: "Domain Joining Steps (00000002).pdf", type: "pdf", desc: "Active Directory user joining manual guide" },
+        { name: "domain_migration_for_ubuntu.sh", type: "sh", desc: "Automated Ubuntu workstation migration deployment binary" },
+        { name: "FortiClient VPN Installation Guide for Windows.pptx", type: "pptx", desc: "Microsoft PowerPoint network guide presentation" },
+        { name: "setup-lightdm.sh", type: "sh", desc: "X11 Display Manager parameters script config file" },
+        { name: "USB access for RE.xlsx", type: "xlsx", desc: "Microsoft Excel structural peripheral configuration logs" },
+        { name: "Wine/", type: "dir", desc: "Sub-directory setup stack workspace folder" },
+        { name: "XBLINUXVPNMANAGER.zip", type: "zip", desc: "Compressed workspace deployment utility archive file" }
+    ],
+    "DWS Setup for Win & Ubuntu": [
+        { name: "DWS Setup/", type: "dir", desc: "System Setup workspace sub-folder" },
+        { name: "DWS Setup.tar", type: "zip", desc: "Linux Compressed Archive Storage • 31,342 KB" }
+    ],
+    "Operating System (ISO)": [
+        { name: "ventoy-1.1.10/", type: "dir", desc: "Ventoy boot engine configuration directory folder" },
+        { name: "linuxmint-22.1-cinnamon-64bit", type: "iso", desc: "Disc Image File OS System Build • 29,10,656 KB" },
+        { name: "linuxmint-22.3-cinnamon-64bit", type: "iso", desc: "Disc Image File OS System Build • 30,19,200 KB" },
+        { name: "Office 2021 Home & Business", type: "iso", desc: "Disc Image File Production Suite Build • 46,83,582 KB" },
+        { name: "ProPlus2019Retail", type: "iso", desc: "Disc Image File Office Deployment Package • 41,90,404 KB" },
+        { name: "ProPlus2021Retail", type: "iso", desc: "Disc Image File Office Deployment Package • 49,41,560 KB" },
+        { name: "SW_DVD5_Office_Professional_Plus_2016...", type: "iso", desc: "Disc Image File Enterprise Resource Installer • 9,73,808 KB" },
+        { name: "ubuntu-18.04.6-desktop-amd64", type: "iso", desc: "Disc Image File Linux OS Workstation Build • 24,55,200 KB" },
+        { name: "ubuntu-20.04.6-desktop-amd64", type: "iso", desc: "Disc Image File Linux OS Workstation Build • 42,49,476 KB" },
+        { name: "ubuntu-22.04.4-desktop-amd64", type: "iso", desc: "Disc Image File Linux OS Workstation Build • 48,99,762 KB" },
+        { name: "ubuntu-25.10-desktop-amd64", type: "iso", desc: "Disc Image File Linux OS Workstation Build • 55,68,868 KB" },
+        { name: "ubuntu-26.04-desktop-amd64", type: "iso", desc: "Disc Image File Linux OS Workstation Build • 63,66,186 KB" },
+        { name: "Win10_22H2_English_x64v1", type: "iso", desc: "Disc Image File Windows Core Client Core • 59,97,046 KB" },
+        { name: "windows 11 pro x64 bit iso", type: "iso", desc: "Disc Image File Windows OS Standard Workspace • 47,60,306 KB" }
+    ],
+    "Linux Software": [
+        { name: "anydesk_7.1.3-1_amd64.deb", type: "linux", desc: "DEB Linux Executable Application Package • 14,559 KB" },
+        { name: "google-chrome-stable_current_amd64.deb", type: "linux", desc: "DEB Linux Executable Application Package • 1,16,158 KB" },
+        { name: "wps-office_11.1.0.11723.XA_amd64.deb", type: "linux", desc: "DEB Linux Executable Application Package • 3,11,419 KB" }
+    ],
+    "Windows Software": [
+        { name: "7z2407-x64", type: "exe", desc: "File Archiver Extraction Engine Application Package" },
+        { name: "AnyDesk_2", type: "exe", desc: "Remote Workstation Support Application Package" },
+        { name: "Argox_2024.2", type: "exe", desc: "Label Printer Asset Driver Installation Package" },
+        { name: "ChromeStandaloneSetup64", type: "exe", desc: "Offline Production Web Browser Setup Package" },
+        { name: "Firefox Setup 128.7.0esr", type: "exe", desc: "Enterprise Extended Support Release Browser Application" },
+        { name: "Firefox Setup 145.0.2", type: "exe", desc: "Standard High Performance Desktop Web Browser Setup" },
+        { name: "HP_Laser_1003-1008_Full_Software_and_Drivers_1.09", type: "exe", desc: "HP System Print Driver Assembly Core Package" },
+        { name: "hp_LJ1020_Full_Solution-v2012_918_1_57980", type: "exe", desc: "HP LaserJet Printer Setup Solution Core Suite" },
+        { name: "LBP2900_R150_V330_W64_uk_EN_2", type: "exe", desc: "Canon Printer Asset System Integration File Installer" },
+        { name: "LJPro_MFP_M125-126_full_solution_15311", type: "exe", desc: "Multi-Function Print Management Software Driver Suite" },
+        { name: "MF220MFDriverV450WPEN", type: "exe", desc: "Network Hardware Core Controller Deployment Executable" },
+        { name: "Mozilla_Thunderbird_(32bit)_v115.1.1", type: "exe", desc: "Desktop Email Configuration Client Communications Program" },
+        { name: "Newland_2024.3", type: "exe", desc: "Peripheral Hardware Scanning Automation Subsystem Driver" },
+        { name: "node-v8.9.4-x64", type: "exe", desc: "NodeJS Server-Side Runtime Deployment Environment" },
+        { name: "rufus-4.6", type: "exe", desc: "Bootable Drive Core Utility Tool Application Program" },
+        { name: "StorageExplorer-windows-x64", type: "exe", desc: "Cloud Storage Container Data Resource Management Explorer" },
+        { name: "TeamViewer_Setup_x64", type: "exe", desc: "Enterprise Virtual Support Framework Management Client" },
+        { name: "Thunderbird Setup 145.0", type: "exe", desc: "Advanced Mail Ecosystem Management Station Desktop Suite" },
+        { name: "vlc-3.0.21-win64", type: "exe", desc: "Open-Source Multimedia Codecs Core Media Player Suite" },
+        { name: "winrar-x64-713", type: "exe", desc: "High Compression Packaging Utility Management Core Archive Tool" },
+        { name: "WPSOffice_23155", type: "exe", desc: "Office Productivity Workspace Automation Software Suit" }
+    ],
+    "Documents": [
+        { name: "Show scanner newland", type: "pdf", desc: "WPS PDF Reference Document Manual • 46 KB" },
+        { name: "Show_Honeywell_Scanner_Serial_Number", type: "pdf", desc: "WPS PDF Reference Document Manual • 61 KB" }
+    ],
+    "Wine": [
+        { name: "wine_environment_sub_installer.sh", type: "sh", desc: "Wine translation subsystem execution binary" }
+    ],
+    "DWS Setup": [
+        { name: "dws_installer_core.msi", type: "exe", desc: "Windows Architecture automation framework core" }
+    ],
+    "ventoy-1.1.10": [
+        { name: "Ventoy2Disk.exe", type: "exe", desc: "Boot Engine Flash Storage Formatting Executive Executable" }
+    ]
+};
+
+window.onload = function() {
+    if (localStorage.getItem("itPortalLoggedIn") === "true") {
+        document.getElementById("loginOverlay").style.display = "none";
+        document.getElementById("currentAdminName").innerText = "Active User: " + localStorage.getItem("itPortalDisplayName");
+    }
+}
+
+function checkLogin() {
+    const userInput = document.getElementById("usernameField").value.trim().toLowerCase();
+    const passwordInput = document.getElementById("passwordField").value;
+    const errorMsg = document.getElementById("errorMsg");
+    const userAccount = allowedUsers[userInput];
+
+    if (userAccount && userAccount.password === passwordInput) {
+        localStorage.setItem("itPortalLoggedIn", "true");
+        localStorage.setItem("itPortalUser", userInput);
+        localStorage.setItem("itPortalDisplayName", userAccount.displayName);
+        document.getElementById("loginOverlay").style.display = "none";
+        document.getElementById("currentAdminName").innerText = "Active User: " + userAccount.displayName;
+        document.getElementById("usernameField").value = "";
+        document.getElementById("passwordField").value = "";
+        errorMsg.style.display = "none";
+    } else {
+        errorMsg.style.display = "block";
+        document.getElementById("passwordField").value = "";
+    }
+}
+
+function logOut() {
+    localStorage.removeItem("itPortalLoggedIn");
+    localStorage.removeItem("itPortalUser");
+    localStorage.removeItem("itPortalDisplayName");
+    window.location.reload();
+}
+
+function handleKeyPress(event) {
+    if (event.key === "Enter") { checkLogin(); }
+}
+
+function filterCategory(category, idKey) {
+    closeFolder();
+    
+    let cards = document.getElementsByClassName("card");
+    let searchInput = document.getElementById("search");
+    searchInput.value = ""; 
+    
+    for (let i = 0; i < cards.length; i++) {
+        if (category === 'all') {
+            cards[i].style.display = "";
+        } else {
+            cards[i].style.display = cards[i].classList.contains(category) ? "" : "none";
+        }
+    }
+    
+    let links = document.querySelectorAll(".nav-links a");
+    links.forEach(link => link.classList.remove("active"));
+    if(idKey) {
+        document.getElementById(idKey).classList.add("active");
+    }
+}
+
+function searchFiles() {
+    let input = document.getElementById("search");
+    let filter = input.value.toUpperCase();
+    let cards = document.getElementsByClassName("card");
+    for (let i = 0; i < cards.length; i++) {
+        let txt = cards[i].innerText;
+        cards[i].style.display = txt.toUpperCase().indexOf(filter) > -1 ? "" : "none";
+    }
+}
+
+function openFolder(folderName) {
+    document.getElementById("mainDirectoryView").style.display = "none";
+    document.getElementById("folderPanel").style.display = "block";
+    document.getElementById("currentFolderName").innerText = folderName;
+    
+    const fileContainer = document.getElementById("dynamicFileItems");
+    fileContainer.innerHTML = ""; 
+    
+    const targetFiles = folderDatabase[folderName] || [];
+    
+    if(targetFiles.length === 0) {
+        fileContainer.innerHTML = `<div style="padding: 30px; color:#64748b; text-align:center; font-weight: 500;">📂 Empty directory folder or no resources found.</div>`;
+        return;
+    }
+    
+    targetFiles.forEach(file => {
+        let icon = "📄";
+        let iconClass = "";
+        let interactiveBtn = "";
+        
+        switch(file.type) {
+            case 'sh': icon = "📜"; iconClass = "icon-sh"; break;
+            case 'pdf': icon = "📕"; iconClass = "icon-pdf"; break;
+            case 'pptx': icon = "📙"; iconClass = "icon-pptx"; break;
+            case 'xlsx': icon = "📗"; iconClass = "icon-xlsx"; break;
+            case 'zip': icon = "🗜️"; iconClass = "icon-zip"; break;
+            case 'exe': icon = "⚙️"; iconClass = "icon-exe"; break;
+            case 'iso': icon = "💿"; iconClass = "icon-iso"; break;
+            case 'linux': icon = "🐧"; iconClass = "icon-sh"; break;
+            case 'dir': icon = "📁"; iconClass = "icon-dir"; break;
+        }
+
+        if(file.type === 'dir') {
+            let cleanedFolderName = file.name.replace('/', '');
+            interactiveBtn = `<button class="btn btn-folder" onclick="openFolder('${cleanedFolderName}')">Open Folder</button>`;
+        } else {
+            interactiveBtn = `<a class="btn" href="${encodeURIComponent(folderName)}/${encodeURIComponent(file.name)}" download>Download File</a>`;
+        }
+        
+        const rowHTML = `
+            <div class="file-row">
+                <div class="file-info">
+                    <h3><span class="${iconClass}">${icon}</span> ${file.name}</h3>
+                    <p>${file.desc}</p>
+                </div>
+                ${interactiveBtn}
+            </div>
+        `;
+        fileContainer.innerHTML += rowHTML;
+    });
+}
+
+function handleSidebarItem(folderName, category, idKey) {
+    filterCategory(category, idKey);
+    openFolder(folderName);
+}
+
+function closeFolder() {
+    document.getElementById("folderPanel").style.display = "none";
+    document.getElementById("mainDirectoryView").style.display = "block";
+}
+</script>
+</head>
+<body>
+
+<div id="loginOverlay" class="login-overlay">
+    <div class="login-box">
+        <div class="login-brand-header">⚡ XPRESS<span>BEES</span></div>
+        <h2>IT Portal Gateway</h2>
+        <div class="credits">Systems Management by Atul Ingale</div>
+        <p>Provide authorization credentials to access resources.</p>
+        
+        <input type="text" id="usernameField" class="login-input" placeholder="Username" autocomplete="off" autofocus>
+        <input type="password" id="passwordField" class="login-input" placeholder="Password" onkeypress="handleKeyPress(event)">
+        <div id="errorMsg" class="error-msg">Access Denied. Invalid credentials.</div>
+        <button class="btn" style="width: 100%; border: none; cursor: pointer; padding: 10px;" onclick="checkLogin()">Authenticate</button>
+    </div>
+</div>
+
+<div class="sidebar">
+    <div class="sidebar-top">
+        <div class="sidebar-header">
+            <div class="sidebar-brand">XB <span>PORTAL</span></div>
+            <p id="currentAdminName">Active User: Suraj Langar</p>
+        </div>
+        <div class="nav-links">
+            <a id="link-all" onclick="filterCategory('all', 'link-all')" class="active">💻 All IT Software</a>
+            <a id="link-vpn" onclick="handleSidebarItem('Domain Join & CCTV Scripts', 'vpn', 'link-vpn')">🔒 Scripts & VPN</a>
+            <a id="link-iso" onclick="handleSidebarItem('Operating System (ISO)', 'iso', 'link-iso')">💿 ISO Files</a>
+            <a id="link-linux" onclick="handleSidebarItem('Linux Software', 'linux', 'link-linux')">🐧 Linux Software</a>
+            <a id="link-windows" onclick="handleSidebarItem('Windows Software', 'windows', 'link-windows')">🪟 Windows Software</a>
+            <a id="link-docs" onclick="handleSidebarItem('Documents', 'documents', 'link-docs')">📁 Documents</a>
+            
+            <div class="sidebar-quote">
+                "We don't just support technology—we create the foundation that enables communication, collaboration, security, innovation, and business growth across the entire organization."
+            </div>
+            <div class="sidebar-quote">
+                "Behind every successful business is a strong technology foundation, and behind that foundation is an IT team dedicated to innovation, reliability, security, and excellence."
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="content">
+    <div class="top-controls">
+        <button onclick="logOut()" class="btn-logout">🚪 Log Out</button>
+    </div>
+
+    <div class="ticker-panel">
+        <div class="ticker-label">🎯 Focus</div>
+        <div class="ticker-wrap">
+            <div class="ticker-content">
+                <span class="ticker-string">
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Get It Done. On Time. Every Time."&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Your Clock Won’t Wait — Neither Should You."&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Your mindset is everything."&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Work Finished Before the Deadline Strikes."&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"Beat the Clock, Own the Day."
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div id="mainDirectoryView">
+        <div class="header">
+            <h1>IT Software Download Center</h1>
+            <div class="creator-tag">🛠️ Page Created by: Atul Ingale</div>
+            <p>Index of <strong>D:\ATUL</strong> | Vol: 2E43-FAF1</p>
+            <input type="text" id="search" class="search" placeholder="Search files and folders..." onkeyup="searchFiles()">
+        </div>
+
+        <div class="card-container">
+            <div class="card folder vpn">
+                <div class="card-details">
+                    <h3>📁 Domain Join & CCTV Scripts</h3>
+                    <p>Directory • Modified: 11-06-2026 19:40</p>
+                </div>
+                <button class="btn btn-folder" onclick="openFolder('Domain Join & CCTV Scripts')">Open Folder</button>
+            </div>
+            <div class="card folder vpn">
+                <div class="card-details">
+                    <h3>📁 DWS Setup for Win & Ubuntu</h3>
+                    <p>Directory • Modified: 11-06-2026 19:38</p>
+                </div>
+                <button class="btn btn-folder" onclick="openFolder('DWS Setup for Win & Ubuntu')">Open Folder</button>
+            </div>
+            <div class="card folder iso">
+                <div class="card-details">
+                    <h3>📁 Operating System (ISO)</h3>
+                    <p>Directory • Modified: 11-06-2026 19:40</p>
+                </div>
+                <button class="btn btn-folder" onclick="openFolder('Operating System (ISO)')">Open Folder</button>
+            </div>
+            <div class="card folder linux">
+                <div class="card-details">
+                    <h3>📁 Linux Software</h3>
+                    <p>Directory • Modified: 11-06-2026 14:57</p>
+                </div>
+                <button class="btn btn-folder" onclick="openFolder('Linux Software')">Open Folder</button>
+            </div>
+            <div class="card folder windows">
+                <div class="card-details">
+                    <h3>📁 Windows Software</h3>
+                    <p>Directory • Modified: 11-06-2026 14:56</p>
+                </div>
+                <button class="btn btn-folder" onclick="openFolder('Windows Software')">Open Folder</button>
+            </div>
+            <div class="card folder documents">
+                <div class="card-details">
+                    <h3>📁 Documents</h3>
+                    <p>Directory • Modified: 11-06-2026 19:54</p>
+                </div>
+                <button class="btn btn-folder" onclick="openFolder('Documents')">Open Folder</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="folderPanel">
+        <button class="btn btn-back" onclick="closeFolder()">⬅️ Back to Main Directory</button>
+        
+        <div class="folder-path-header">
+            📁 Index of: /<span id="currentFolderName">Folder</span>/
+        </div>
+
+        <div class="file-container" id="dynamicFileItems"></div>
+    </div>
+</div>
+
+</body>
+</html>
